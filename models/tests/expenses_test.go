@@ -21,7 +21,7 @@ func TestMain(t *testing.T) {
 		expense := models.Expense{Amount: amount, Description: description}
 
 		// When
-		expenses.AddExpense(expense)
+		expenses.Add(expense)
 
 		// Then
 		asserts.Equal(1, len(expenses))
@@ -42,8 +42,8 @@ func TestMain(t *testing.T) {
 		expense2 := models.Expense{Amount: amount, Description: description}
 
 		// When
-		expenses.AddExpense(expense1)
-		expenses.AddExpense(expense2)
+		expenses.Add(expense1)
+		expenses.Add(expense2)
 
 		// Then
 		asserts.Equal(2, len(expenses))
@@ -59,12 +59,12 @@ func TestMain(t *testing.T) {
 		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.AddExpense(expense)
+		expenses.Add(expense)
 
 		// When
 		expense.Id = 1
 		expense.Description = "Dinner"
-		expenses.UpdateExpense(expense)
+		expenses.Update(expense)
 
 		// Then
 		asserts.Equal(1, len(expenses))
@@ -80,12 +80,12 @@ func TestMain(t *testing.T) {
 		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.AddExpense(expense)
+		expenses.Add(expense)
 
 		// When
 		expense.Id = 2
 		expense.Description = "Dinner"
-		expenses.UpdateExpense(expense)
+		expenses.Update(expense)
 
 		// Then
 		asserts.Equal(1, len(expenses))
@@ -101,10 +101,10 @@ func TestMain(t *testing.T) {
 		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.AddExpense(expense)
+		expenses.Add(expense)
 
 		// When
-		expenses.DeleteExpense(1)
+		expenses.Delete(1)
 
 		// Then
 		asserts.Equal(0, len(expenses))
@@ -117,10 +117,10 @@ func TestMain(t *testing.T) {
 		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.AddExpense(expense)
+		expenses.Add(expense)
 
 		// When
-		expenses.DeleteExpense(2)
+		expenses.Delete(2)
 
 		// Then
 		asserts.Equal(1, len(expenses))
@@ -136,13 +136,13 @@ func TestMain(t *testing.T) {
 		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.AddExpense(expense)
+		expenses.Add(expense)
 
 		expectedMessage := dsl.JoinMessage(expenses)
 		expectedMessage = fmt.Sprintf(models.HeaderFormat + "\n" + expectedMessage)
 
 		// When
-		result := dsl.OutputToString(expenses.ListExpenses)
+		result := dsl.OutputToString(expenses.List)
 
 		// Then
 		asserts.Equal(1, len(expenses))
@@ -157,7 +157,7 @@ func TestMain(t *testing.T) {
 		expenses := models.Expenses{}
 
 		// When
-		result := dsl.OutputToString(expenses.ListExpenses)
+		result := dsl.OutputToString(expenses.List)
 
 		// Then
 		asserts.Equal(models.HeaderFormat+"\n", result)
@@ -170,12 +170,12 @@ func TestMain(t *testing.T) {
 		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.AddExpense(expense)
+		expenses.Add(expense)
 
 		amount = 15
 		description = "Dinner"
 		expense = models.Expense{Amount: amount, Description: description}
-		expenses.AddExpense(expense)
+		expenses.Add(expense)
 
 		// When
 		result := dsl.OutputToString(expenses.Summary)

@@ -31,7 +31,7 @@ func (e *Expense) Print() {
 	fmt.Printf(ExpensesStringFormat, e.Id, e.Description, e.Amount, e.CreatedAt.Format(DateFormat), e.UpdatedAt.Format(DateFormat))
 }
 
-func (e *Expenses) AddExpense(expense Expense) {
+func (e *Expenses) Add(expense Expense) {
 	expense.Id = e.assignId()
 	expense.CreatedAt = time.Now()
 	*e = append(*e, &expense)
@@ -47,7 +47,7 @@ func (e *Expenses) assignId() int {
 	return (currentMaxId + 1)
 }
 
-func (e *Expenses) UpdateExpense(expense Expense) {
+func (e *Expenses) Update(expense Expense) {
 	for _, item := range *e {
 		if item.Id == expense.Id {
 			item.Amount = expense.Amount
@@ -59,7 +59,7 @@ func (e *Expenses) UpdateExpense(expense Expense) {
 	}
 }
 
-func (e *Expenses) DeleteExpense(id int) {
+func (e *Expenses) Delete(id int) {
 	for i, item := range *e {
 		if item.Id == id {
 			*e = append((*e)[:i], (*e)[i+1:]...)
@@ -68,7 +68,7 @@ func (e *Expenses) DeleteExpense(id int) {
 	}
 }
 
-func (e *Expenses) ListExpenses() {
+func (e *Expenses) List() {
 	fmt.Printf(HeaderFormat + "\n")
 	for _, expense := range *e {
 		expense.Print()
