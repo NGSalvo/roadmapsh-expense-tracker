@@ -74,3 +74,11 @@ func (e *Expenses) ListExpenses() {
 		expense.Print()
 	}
 }
+
+func (e *Expenses) Summary() {
+	total := 0
+	for _, expense := range *e {
+		total += expense.Amount
+	}
+	fmt.Printf("Total expenses: %d\n", total)
+}

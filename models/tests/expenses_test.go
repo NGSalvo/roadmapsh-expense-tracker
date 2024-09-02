@@ -163,7 +163,26 @@ func TestMain(t *testing.T) {
 		asserts.Equal(models.HeaderFormat+"\n", result)
 	})
 
-	// should print the summary of all expenses
+	t.Run("✅ should print the summary of all expenses", func(t *testing.T) {
+		// Given
+		amount := 20
+		description := "Lunch"
+		expenses := models.Expenses{}
+
+		expense := models.Expense{Amount: amount, Description: description}
+		expenses.AddExpense(expense)
+
+		amount = 15
+		description = "Dinner"
+		expense = models.Expense{Amount: amount, Description: description}
+		expenses.AddExpense(expense)
+
+		// When
+		result := dsl.OutputToString(expenses.Summary)
+
+		// Then
+		asserts.Equal("Total expenses: 35\n", result)
+	})
 
 	// should print the summary of all expenses for a specific month of the current year
 }
