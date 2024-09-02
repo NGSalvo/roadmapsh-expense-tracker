@@ -1,6 +1,7 @@
-package main
+package tests
 
 import (
+	"expense-tracker/models"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,9 +14,9 @@ func TestMain(t *testing.T) {
 		// Given
 		amount := 20
 		description := "Lunch"
-		expenses := Expenses{}
+		expenses := models.Expenses{}
 
-		expense := Expense{Amount: amount, Description: description}
+		expense := models.Expense{Amount: amount, Description: description}
 
 		// When
 		expenses.AddExpense(expense)
@@ -33,10 +34,10 @@ func TestMain(t *testing.T) {
 		// Given
 		amount := 20
 		description := "Lunch"
-		expenses := Expenses{}
+		expenses := models.Expenses{}
 
-		expense1 := Expense{Amount: amount, Description: description}
-		expense2 := Expense{Amount: amount, Description: description}
+		expense1 := models.Expense{Amount: amount, Description: description}
+		expense2 := models.Expense{Amount: amount, Description: description}
 
 		// When
 		expenses.AddExpense(expense1)
@@ -53,9 +54,9 @@ func TestMain(t *testing.T) {
 		// Given
 		amount := 20
 		description := "Lunch"
-		expenses := Expenses{}
+		expenses := models.Expenses{}
 
-		expense := Expense{Amount: amount, Description: description}
+		expense := models.Expense{Amount: amount, Description: description}
 		expenses.AddExpense(expense)
 
 		// When
@@ -74,9 +75,9 @@ func TestMain(t *testing.T) {
 		// Given
 		amount := 20
 		description := "Lunch"
-		expenses := Expenses{}
+		expenses := models.Expenses{}
 
-		expense := Expense{Amount: amount, Description: description}
+		expense := models.Expense{Amount: amount, Description: description}
 		expenses.AddExpense(expense)
 
 		// When
@@ -95,9 +96,9 @@ func TestMain(t *testing.T) {
 		// Given
 		amount := 20
 		description := "Lunch"
-		expenses := Expenses{}
+		expenses := models.Expenses{}
 
-		expense := Expense{Amount: amount, Description: description}
+		expense := models.Expense{Amount: amount, Description: description}
 		expenses.AddExpense(expense)
 
 		// When
@@ -111,9 +112,9 @@ func TestMain(t *testing.T) {
 		// Given
 		amount := 20
 		description := "Lunch"
-		expenses := Expenses{}
+		expenses := models.Expenses{}
 
-		expense := Expense{Amount: amount, Description: description}
+		expense := models.Expense{Amount: amount, Description: description}
 		expenses.AddExpense(expense)
 
 		// When
@@ -125,4 +126,5 @@ func TestMain(t *testing.T) {
 		asserts.Equal("Lunch", expenses[0].Description)
 		asserts.Nil(expenses[0].UpdatedAt)
 	})
+
 }
