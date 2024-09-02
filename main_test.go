@@ -21,9 +21,10 @@ func TestMain(t *testing.T) {
 		expenses.AddExpense(expense)
 
 		// Then
-		asserts.Equal(len(expenses), 1)
-		asserts.Equal(expenses[0].Amount, 20)
-		asserts.Equal(expenses[0].Description, "Lunch")
+		asserts.Equal(1, len(expenses))
+		asserts.Equal(1, expenses[0].Id)
+		asserts.Equal(20, expenses[0].Amount)
+		asserts.Equal("Lunch", expenses[0].Description)
 		asserts.NotNil(expenses[0].CreatedAt)
 		asserts.Nil(expenses[0].UpdatedAt)
 	})

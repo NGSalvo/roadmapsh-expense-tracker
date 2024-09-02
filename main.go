@@ -8,9 +8,10 @@ func main() {
 
 type (
 	Expense struct {
+		Id          int
 		Amount      int
 		Description string
-		CreatedAt   *time.Time
+		CreatedAt   time.Time
 		UpdatedAt   *time.Time
 	}
 
@@ -18,5 +19,17 @@ type (
 )
 
 func (e *Expenses) AddExpense(expense Expense) {
+	expense.Id = e.assignId()
+	expense.CreatedAt = time.Now()
 	*e = append(*e, &expense)
+}
+
+func (e *Expenses) assignId() int {
+	currentMaxId := 0
+	for _, expense := range *e {
+		if expense.Id > currentMaxId {
+			currentMaxId = expense.Id
+		}
+	}
+	return (currentMaxId + 1)
 }
