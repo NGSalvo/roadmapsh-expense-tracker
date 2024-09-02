@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type (
 	Expense struct {
@@ -13,6 +16,20 @@ type (
 
 	Expenses []*Expense
 )
+
+const (
+	HeaderFormat         = "|ID|Description|Amount|Created At|Updated At|"
+	ExpensesStringFormat = "|%-3d|%-10s|%-6d|%-10s|%-10s|"
+	DateFormat           = time.DateOnly
+)
+
+func (e *Expense) Print() {
+	if e.UpdatedAt == nil {
+		fmt.Printf(ExpensesStringFormat, e.Id, e.Description, e.Amount, e.CreatedAt.Format(time.DateOnly), "")
+		return
+	}
+	fmt.Printf(ExpensesStringFormat, e.Id, e.Description, e.Amount, e.CreatedAt.Format(DateFormat), e.UpdatedAt.Format(DateFormat))
+}
 
 func (e *Expenses) AddExpense(expense Expense) {
 	expense.Id = e.assignId()
@@ -48,5 +65,12 @@ func (e *Expenses) DeleteExpense(id int) {
 			*e = append((*e)[:i], (*e)[i+1:]...)
 			break
 		}
+	}
+}
+
+func (e *Expenses) ListExpenses() {
+	fmt.Printf(HeaderFormat + "\n")
+	for _, expense := range *e {
+		expense.Print()
 	}
 }

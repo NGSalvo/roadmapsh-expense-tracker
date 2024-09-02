@@ -2,6 +2,8 @@ package tests
 
 import (
 	"expense-tracker/models"
+	"expense-tracker/models/tests/dsl"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -127,4 +129,41 @@ func TestMain(t *testing.T) {
 		asserts.Nil(expenses[0].UpdatedAt)
 	})
 
+	t.Run("✅ should list all expenses", func(t *testing.T) {
+		// Given
+		amount := 20
+		description := "Lunch"
+		expenses := models.Expenses{}
+
+		expense := models.Expense{Amount: amount, Description: description}
+		expenses.AddExpense(expense)
+
+		expectedMessage := dsl.JoinMessage(expenses)
+		expectedMessage = fmt.Sprintf(models.HeaderFormat + "\n" + expectedMessage)
+
+		// When
+		result := dsl.OutputToString(expenses.ListExpenses)
+
+		// Then
+		asserts.Equal(1, len(expenses))
+		asserts.Equal(1, expenses[0].Id)
+		asserts.Equal("Lunch", expenses[0].Description)
+		asserts.Nil(expenses[0].UpdatedAt)
+		asserts.Equal(expectedMessage, result)
+	})
+
+	t.Run("✅ should print the header when there are no expenses", func(t *testing.T) {
+		// Given
+		expenses := models.Expenses{}
+
+		// When
+		result := dsl.OutputToString(expenses.ListExpenses)
+
+		// Then
+		asserts.Equal(models.HeaderFormat+"\n", result)
+	})
+
+	// should print the summary of all expenses
+
+	// should print the summary of all expenses for a specific month of the current year
 }

@@ -2,11 +2,14 @@ package dsl
 
 import (
 	"bytes"
+	"expense-tracker/models"
+	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
-func outputToString(callback func()) string {
+func OutputToString(callback func()) string {
 
 	// Create a pipe to capture the output
 	r, w, _ := os.Pipe()
@@ -34,4 +37,16 @@ func outputToString(callback func()) string {
 	io.Copy(&buf, r)
 
 	return buf.String()
+}
+
+func JoinMessage(expenses models.Expenses) string {
+	message := []string{}
+	for _, expense := range expenses {
+		if expense.UpdatedAt == nil {
+			message = append(message, fmt.Sprintf(models.ExpensesStringFormat, expense.Id, expense.Description, expense.Amount, expense.CreatedAt.Format(models.DateFormat), ""))
+			continue
+		}
+		message = append(message, fmt.Sprintf(models.ExpensesStringFormat, expense.Id, expense.Description, expense.Amount, expense.CreatedAt.Format(models.DateFormat), expense.UpdatedAt.Format(models.DateFormat)))
+	}
+	return strings.Join(message, "\n")
 }
