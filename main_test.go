@@ -90,4 +90,39 @@ func TestMain(t *testing.T) {
 		asserts.Equal("Lunch", expenses[0].Description)
 		asserts.Nil(expenses[0].UpdatedAt)
 	})
+
+	t.Run("✅ should delete an expense", func(t *testing.T) {
+		// Given
+		amount := 20
+		description := "Lunch"
+		expenses := Expenses{}
+
+		expense := Expense{Amount: amount, Description: description}
+		expenses.AddExpense(expense)
+
+		// When
+		expenses.DeleteExpense(1)
+
+		// Then
+		asserts.Equal(0, len(expenses))
+	})
+
+	t.Run("❌ should not delete an non-existent expense", func(t *testing.T) {
+		// Given
+		amount := 20
+		description := "Lunch"
+		expenses := Expenses{}
+
+		expense := Expense{Amount: amount, Description: description}
+		expenses.AddExpense(expense)
+
+		// When
+		expenses.DeleteExpense(2)
+
+		// Then
+		asserts.Equal(1, len(expenses))
+		asserts.Equal(1, expenses[0].Id)
+		asserts.Equal("Lunch", expenses[0].Description)
+		asserts.Nil(expenses[0].UpdatedAt)
+	})
 }

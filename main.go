@@ -45,3 +45,12 @@ func (e *Expenses) UpdateExpense(expense Expense) {
 		}
 	}
 }
+
+func (e *Expenses) DeleteExpense(id int) {
+	for i, item := range *e {
+		if item.Id == id {
+			*e = append((*e)[:i], (*e)[i+1:]...)
+			break
+		}
+	}
+}
