@@ -33,3 +33,15 @@ func (e *Expenses) assignId() int {
 	}
 	return (currentMaxId + 1)
 }
+
+func (e *Expenses) UpdateExpense(expense Expense) {
+	for _, item := range *e {
+		if item.Id == expense.Id {
+			item.Amount = expense.Amount
+			item.Description = expense.Description
+			updatedAt := time.Now()
+			item.UpdatedAt = &updatedAt
+			break
+		}
+	}
+}

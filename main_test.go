@@ -9,7 +9,7 @@ import (
 func TestMain(t *testing.T) {
 	asserts := assert.New(t)
 
-	t.Run("should add an expense with a description and amount", func(t *testing.T) {
+	t.Run("✅ should add an expense with a description and amount", func(t *testing.T) {
 		// Given
 		amount := 20
 		description := "Lunch"
@@ -29,7 +29,7 @@ func TestMain(t *testing.T) {
 		asserts.Nil(expenses[0].UpdatedAt)
 	})
 
-	t.Run("should add two expenses", func(t *testing.T) {
+	t.Run("✅ should add two expenses", func(t *testing.T) {
 		// Given
 		amount := 20
 		description := "Lunch"
@@ -49,4 +49,45 @@ func TestMain(t *testing.T) {
 		asserts.True(expenses[0].CreatedAt.Before(expenses[1].CreatedAt))
 	})
 
+	t.Run("✅ should update an expense", func(t *testing.T) {
+		// Given
+		amount := 20
+		description := "Lunch"
+		expenses := Expenses{}
+
+		expense := Expense{Amount: amount, Description: description}
+		expenses.AddExpense(expense)
+
+		// When
+		expense.Id = 1
+		expense.Description = "Dinner"
+		expenses.UpdateExpense(expense)
+
+		// Then
+		asserts.Equal(1, len(expenses))
+		asserts.Equal(1, expenses[0].Id)
+		asserts.Equal("Dinner", expenses[0].Description)
+		asserts.True(expenses[0].CreatedAt.Before(*expenses[0].UpdatedAt))
+	})
+
+	t.Run("❌ should not updated an non-existent expense", func(t *testing.T) {
+		// Given
+		amount := 20
+		description := "Lunch"
+		expenses := Expenses{}
+
+		expense := Expense{Amount: amount, Description: description}
+		expenses.AddExpense(expense)
+
+		// When
+		expense.Id = 2
+		expense.Description = "Dinner"
+		expenses.UpdateExpense(expense)
+
+		// Then
+		asserts.Equal(1, len(expenses))
+		asserts.Equal(1, expenses[0].Id)
+		asserts.Equal("Lunch", expenses[0].Description)
+		asserts.Nil(expenses[0].UpdatedAt)
+	})
 }
