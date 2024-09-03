@@ -5,6 +5,7 @@ import (
 	"expense-tracker/models/tests/dsl"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -184,5 +185,114 @@ func TestMain(t *testing.T) {
 		asserts.Equal("Total expenses: 35\n", result)
 	})
 
-	// should print the summary of all expenses for a specific month of the current year
+	t.Run("✅ should print the summary of all expenses for a specific month of the current year", func(t *testing.T) {
+		// Given
+		amount := 20
+		description := "Lunch"
+		expenses := models.Expenses{}
+
+		expense := models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		amount = 15
+		description = "Dinner"
+		expense = models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		amount = 50
+		description = "Dinner"
+		expense = models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		expenses[0].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
+		expenses[1].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
+		expenses[2].CreatedAt = time.Date(time.Now().Year()-1, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+		// When
+		result := dsl.OutputToString(func() {
+			expenses.SummaryForMonth(time.January)
+		})
+
+		// Then
+		asserts.Equal("Total expenses: 35\n", result)
+	})
+
+	t.Run("✅ should print 0 when there are no expenses for a specific month of the current year", func(t *testing.T) {
+		// Given
+		amount := 20
+		description := "Lunch"
+		expenses := models.Expenses{}
+
+		expense := models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		amount = 15
+		description = "Dinner"
+		expense = models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		amount = 50
+		description = "Dinner"
+		expense = models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		expenses[0].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
+		expenses[1].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
+		expenses[2].CreatedAt = time.Date(time.Now().Year()-1, time.February, 1, 0, 0, 0, 0, time.UTC)
+
+		// When
+		result := dsl.OutputToString(func() {
+			expenses.SummaryForMonth(time.February)
+		})
+
+		// Then
+		asserts.Equal("Total expenses: 0\n", result)
+	})
+
+	t.Run("✅ should print the expenses from a specific month and current year taking on account the updated at", func(t *testing.T) {
+		// Given
+		amount := 20
+		description := "Lunch"
+		expenses := models.Expenses{}
+
+		expense := models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		amount = 15
+		description = "Dinner"
+		expense = models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		amount = 50
+		description = "Dinner"
+		expense = models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		amount = 100
+		description = "Lunch"
+		expense = models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		expenses[0].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
+		expenses[1].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
+		expenses[2].CreatedAt = time.Date(time.Now().Year()-1, time.January, 1, 0, 0, 0, 0, time.UTC)
+		expenses[3].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
+
+		updateAt := time.Date(time.Now().Year(), time.January, 25, 0, 0, 0, 0, time.UTC)
+		expenses[0].UpdatedAt = &updateAt
+
+		updateAt2 := time.Date(time.Now().Year(), time.February, 1, 0, 0, 0, 0, time.UTC)
+		expenses[1].UpdatedAt = &updateAt2
+
+		updateAt3 := time.Date(time.Now().Year()+1, time.January, 1, 0, 0, 0, 0, time.UTC)
+		expenses[3].UpdatedAt = &updateAt3
+
+		// When
+		result := dsl.OutputToString(func() {
+			expenses.SummaryForMonth(time.January)
+		})
+
+		// Then
+		asserts.Equal("Total expenses: 20\n", result)
+	})
 }

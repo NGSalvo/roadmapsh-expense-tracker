@@ -82,3 +82,24 @@ func (e *Expenses) Summary() {
 	}
 	fmt.Printf("Total expenses: %d\n", total)
 }
+
+func (e *Expenses) SummaryForMonth(month time.Month) {
+	total := 0
+	for _, expense := range *e {
+		if expense.UpdatedAt == nil {
+			isCurrentYear := expense.CreatedAt.Year() == time.Now().Year()
+			isSameMonth := expense.CreatedAt.Month() == month
+			if isSameMonth && isCurrentYear {
+				total += expense.Amount
+			}
+			continue
+		}
+
+		isCurrentYear := expense.UpdatedAt.Year() == time.Now().Year()
+		isSameMonth := expense.UpdatedAt.Month() == month
+		if isSameMonth && isCurrentYear {
+			total += expense.Amount
+		}
+	}
+	fmt.Printf("Total expenses: %d\n", total)
+}
