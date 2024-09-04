@@ -22,7 +22,7 @@ func TestMain(t *testing.T) {
 		expense := models.Expense{Amount: amount, Description: description}
 
 		// When
-		expenses.Add(expense)
+		err := expenses.Add(expense)
 
 		// Then
 		asserts.Equal(1, len(expenses))
@@ -31,6 +31,7 @@ func TestMain(t *testing.T) {
 		asserts.Equal("Lunch", expenses[0].Description)
 		asserts.NotNil(expenses[0].CreatedAt)
 		asserts.Nil(expenses[0].UpdatedAt)
+		asserts.Nil(err)
 	})
 
 	t.Run("✅ should add two expenses", func(t *testing.T) {
@@ -43,14 +44,32 @@ func TestMain(t *testing.T) {
 		expense2 := models.Expense{Amount: amount, Description: description}
 
 		// When
-		expenses.Add(expense1)
-		expenses.Add(expense2)
+		err := expenses.Add(expense1)
+		err2 := expenses.Add(expense2)
 
 		// Then
 		asserts.Equal(2, len(expenses))
 		asserts.Equal(1, expenses[0].Id)
 		asserts.Equal(2, expenses[1].Id)
 		asserts.True(expenses[0].CreatedAt.Before(expenses[1].CreatedAt))
+		asserts.Nil(err)
+		asserts.Nil(err2)
+	})
+
+	t.Run("❌ should not add an expense with a negative amount", func(t *testing.T) {
+		// Given
+		amount := -20
+		description := "Lunch"
+		expenses := models.Expenses{}
+
+		expense := models.Expense{Amount: amount, Description: description}
+
+		// When
+		expenses.Add(expense)
+
+		// Then
+		asserts.Equal(0, len(expenses))
+		asserts.Error(fmt.Errorf("amount cannot be negative"))
 	})
 
 	t.Run("✅ should update an expense", func(t *testing.T) {

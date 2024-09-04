@@ -31,10 +31,16 @@ func (e *Expense) Print() {
 	fmt.Printf(ExpensesStringFormat, e.Id, e.Description, e.Amount, e.CreatedAt.Format(DateFormat), e.UpdatedAt.Format(DateFormat))
 }
 
-func (e *Expenses) Add(expense Expense) {
+func (e *Expenses) Add(expense Expense) error {
 	expense.Id = e.assignId()
 	expense.CreatedAt = time.Now()
+
+	if expense.Amount < 0 {
+		return fmt.Errorf("amount cannot be negative")
+	}
+
 	*e = append(*e, &expense)
+	return nil
 }
 
 func (e *Expenses) assignId() int {
