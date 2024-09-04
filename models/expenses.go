@@ -53,16 +53,21 @@ func (e *Expenses) assignId() int {
 	return (currentMaxId + 1)
 }
 
-func (e *Expenses) Update(expense Expense) {
+func (e *Expenses) Update(expense Expense) error {
+	if expense.Amount < 0 {
+		return fmt.Errorf("amount cannot be negative")
+	}
+
 	for _, item := range *e {
 		if item.Id == expense.Id {
 			item.Amount = expense.Amount
 			item.Description = expense.Description
 			updatedAt := time.Now()
 			item.UpdatedAt = &updatedAt
-			break
+			return nil
 		}
 	}
+	return fmt.Errorf("expense with ID %d not found", expense.Id)
 }
 
 func (e *Expenses) Delete(id int) {

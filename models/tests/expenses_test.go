@@ -84,13 +84,14 @@ func TestMain(t *testing.T) {
 		// When
 		expense.Id = 1
 		expense.Description = "Dinner"
-		expenses.Update(expense)
+		err := expenses.Update(expense)
 
 		// Then
 		asserts.Equal(1, len(expenses))
 		asserts.Equal(1, expenses[0].Id)
 		asserts.Equal("Dinner", expenses[0].Description)
 		asserts.True(expenses[0].CreatedAt.Before(*expenses[0].UpdatedAt))
+		asserts.Nil(err)
 	})
 
 	t.Run("❌ should not updated an non-existent expense", func(t *testing.T) {
@@ -103,15 +104,37 @@ func TestMain(t *testing.T) {
 		expenses.Add(expense)
 
 		// When
-		expense.Id = 2
+		expense.Id = 5
 		expense.Description = "Dinner"
-		expenses.Update(expense)
+		err := expenses.Update(expense)
 
 		// Then
 		asserts.Equal(1, len(expenses))
 		asserts.Equal(1, expenses[0].Id)
 		asserts.Equal("Lunch", expenses[0].Description)
 		asserts.Nil(expenses[0].UpdatedAt)
+		asserts.Error(fmt.Errorf("expense with ID %d not found", err))
+	})
+
+	t.Run("❌ should not update an expense with a negative amount", func(t *testing.T) {
+		// Given
+		amount := 20
+		description := "Lunch"
+		expenses := models.Expenses{}
+
+		expense := models.Expense{Amount: amount, Description: description}
+		expenses.Add(expense)
+
+		// When
+		expense.Id = 1
+		expense.Amount = -20
+		err := expenses.Update(expense)
+
+		// Then
+		asserts.Equal(1, len(expenses))
+		asserts.Equal(1, expenses[0].Id)
+		asserts.Nil(expenses[0].UpdatedAt)
+		asserts.Equal("amount cannot be negative", err.Error())
 	})
 
 	t.Run("✅ should delete an expense", func(t *testing.T) {
