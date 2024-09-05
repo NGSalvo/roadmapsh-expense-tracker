@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInMemoryStore(t *testing.T) {
+func TestCsvStore(t *testing.T) {
 	asserts := assert.New(t)
 
 	t.Run("✅ should instantiate an in-memory store", func(t *testing.T) {
