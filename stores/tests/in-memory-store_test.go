@@ -3,6 +3,7 @@ package tests
 import (
 	"expense-tracker/models"
 	"expense-tracker/models/tests/dsl"
+	"expense-tracker/stores"
 	"fmt"
 	"testing"
 	"time"
@@ -13,18 +14,27 @@ import (
 func TestMain(t *testing.T) {
 	asserts := assert.New(t)
 
+	t.Run("✅ should instantiate an in-memory store", func(t *testing.T) {
+		// When
+		store := stores.NewInMemoryStore()
+		// Then
+		asserts.NotNil(store)
+	})
+
 	t.Run("✅ should add an expense with a description and amount", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
 
 		// When
-		err := expenses.Add(expense)
+		err := store.Add(expense)
 
 		// Then
+		expenses := *store.Expenses
+		asserts.Nil(err)
 		asserts.Equal(1, len(expenses))
 		asserts.Equal(1, expenses[0].Id)
 		asserts.Equal(20, expenses[0].Amount)
@@ -36,18 +46,19 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ should add two expenses", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense1 := models.Expense{Amount: amount, Description: description}
 		expense2 := models.Expense{Amount: amount, Description: description}
 
 		// When
-		err := expenses.Add(expense1)
-		err2 := expenses.Add(expense2)
+		err := store.Add(expense1)
+		err2 := store.Add(expense2)
 
 		// Then
+		expenses := *store.Expenses
 		asserts.Equal(2, len(expenses))
 		asserts.Equal(1, expenses[0].Id)
 		asserts.Equal(2, expenses[1].Id)
@@ -58,35 +69,37 @@ func TestMain(t *testing.T) {
 
 	t.Run("❌ should not add an expense with a negative amount", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := -20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
 
 		// When
-		expenses.Add(expense)
+		store.Add(expense)
 
 		// Then
+		expenses := *store.Expenses
 		asserts.Equal(0, len(expenses))
 		asserts.Error(fmt.Errorf("amount cannot be negative"))
 	})
 
 	t.Run("✅ should update an expense", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		// When
 		expense.Id = 1
 		expense.Description = "Dinner"
-		err := expenses.Update(expense)
+		err := store.Update(expense)
 
 		// Then
+		expenses := *store.Expenses
 		asserts.Equal(1, len(expenses))
 		asserts.Equal(1, expenses[0].Id)
 		asserts.Equal("Dinner", expenses[0].Description)
@@ -96,19 +109,20 @@ func TestMain(t *testing.T) {
 
 	t.Run("❌ should not updated an non-existent expense", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		// When
 		expense.Id = 5
 		expense.Description = "Dinner"
-		err := expenses.Update(expense)
+		err := store.Update(expense)
 
 		// Then
+		expenses := *store.Expenses
 		asserts.Equal(1, len(expenses))
 		asserts.Equal(1, expenses[0].Id)
 		asserts.Equal("Lunch", expenses[0].Description)
@@ -118,19 +132,20 @@ func TestMain(t *testing.T) {
 
 	t.Run("❌ should not update an expense with a negative amount", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		// When
 		expense.Id = 1
 		expense.Amount = -20
-		err := expenses.Update(expense)
+		err := store.Update(expense)
 
 		// Then
+		expenses := *store.Expenses
 		asserts.Equal(1, len(expenses))
 		asserts.Equal(1, expenses[0].Id)
 		asserts.Nil(expenses[0].UpdatedAt)
@@ -139,33 +154,35 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ should delete an expense", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		// When
-		expenses.Delete(1)
+		store.Delete(1)
 
 		// Then
+		expenses := *store.Expenses
 		asserts.Equal(0, len(expenses))
 	})
 
 	t.Run("❌ should not delete an non-existent expense", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		// When
-		expenses.Delete(2)
+		store.Delete(2)
 
 		// Then
+		expenses := *store.Expenses
 		asserts.Equal(1, len(expenses))
 		asserts.Equal(1, expenses[0].Id)
 		asserts.Equal("Lunch", expenses[0].Description)
@@ -174,18 +191,19 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ should list all expenses", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
+		expenses := *store.Expenses
 		expectedMessage := dsl.JoinMessage(expenses)
 		expectedMessage = fmt.Sprintf(models.HeaderFormat + "\n" + expectedMessage)
 
 		// When
-		result := dsl.OutputToString(expenses.List)
+		result := dsl.OutputToString(store.List)
 
 		// Then
 		asserts.Equal(1, len(expenses))
@@ -197,10 +215,10 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ should print the header when there are no expenses", func(t *testing.T) {
 		// Given
-		expenses := models.Expenses{}
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 
 		// When
-		result := dsl.OutputToString(expenses.List)
+		result := dsl.OutputToString(store.List)
 
 		// Then
 		asserts.Equal(models.HeaderFormat+"\n", result)
@@ -208,20 +226,20 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ should print the summary of all expenses", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		amount = 15
 		description = "Dinner"
 		expense = models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		// When
-		result := dsl.OutputToString(expenses.Summary)
+		result := dsl.OutputToString(store.Summary)
 
 		// Then
 		asserts.Equal("Total expenses: 35\n", result)
@@ -229,30 +247,31 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ should print the summary of all expenses for a specific month of the current year", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		amount = 15
 		description = "Dinner"
 		expense = models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		amount = 50
 		description = "Dinner"
 		expense = models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
+		expenses := *store.Expenses
 		expenses[0].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
 		expenses[1].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
 		expenses[2].CreatedAt = time.Date(time.Now().Year()-1, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 		// When
 		result := dsl.OutputToString(func() {
-			expenses.SummaryForMonth(time.January)
+			store.SummaryForMonth(time.January)
 		})
 
 		// Then
@@ -261,30 +280,31 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ should print 0 when there are no expenses for a specific month of the current year", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		amount = 15
 		description = "Dinner"
 		expense = models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		amount = 50
 		description = "Dinner"
 		expense = models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
+		expenses := *store.Expenses
 		expenses[0].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
 		expenses[1].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
 		expenses[2].CreatedAt = time.Date(time.Now().Year()-1, time.February, 1, 0, 0, 0, 0, time.UTC)
 
 		// When
 		result := dsl.OutputToString(func() {
-			expenses.SummaryForMonth(time.February)
+			store.SummaryForMonth(time.February)
 		})
 
 		// Then
@@ -293,28 +313,29 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ should print the expenses from a specific month and current year taking on account the updated at", func(t *testing.T) {
 		// Given
+		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
 		amount := 20
 		description := "Lunch"
-		expenses := models.Expenses{}
 
 		expense := models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		amount = 15
 		description = "Dinner"
 		expense = models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		amount = 50
 		description = "Dinner"
 		expense = models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
 		amount = 100
 		description = "Lunch"
 		expense = models.Expense{Amount: amount, Description: description}
-		expenses.Add(expense)
+		store.Add(expense)
 
+		expenses := *store.Expenses
 		expenses[0].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
 		expenses[1].CreatedAt = time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.UTC)
 		expenses[2].CreatedAt = time.Date(time.Now().Year()-1, time.January, 1, 0, 0, 0, 0, time.UTC)
@@ -331,7 +352,7 @@ func TestMain(t *testing.T) {
 
 		// When
 		result := dsl.OutputToString(func() {
-			expenses.SummaryForMonth(time.January)
+			store.SummaryForMonth(time.January)
 		})
 
 		// Then
