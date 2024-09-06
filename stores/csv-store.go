@@ -18,10 +18,18 @@ type csvStore struct {
 func NewCsvStore(filename string) models.Store {
 	fileExistAndCreate(filename)
 
-	return &csvStore{
+	store := &csvStore{
 		Expenses: &models.Expenses{},
 		filename: filename,
 	}
+
+	err := store.load()
+
+	if err != nil {
+		panic(err)
+	}
+
+	return store
 }
 
 func (s *csvStore) Add(expense models.Expense) error {
@@ -63,13 +71,12 @@ func (s *csvStore) Update(expense models.Expense) error {
 			item.Description = expense.Description
 			updatedAt := time.Now()
 			item.UpdatedAt = &updatedAt
-			break
+			err := s.save()
+			if err != nil {
+				return err
+			}
+			return nil
 		}
-	}
-	err := s.save()
-
-	if err != nil {
-		return err
 	}
 
 	return fmt.Errorf("expense with ID %d not found", expense.Id)
@@ -81,18 +88,19 @@ func (s *csvStore) Delete(id int) error {
 		if item.Id == id {
 			foundItem = true
 			*s.Expenses = append((*s.Expenses)[:i], (*s.Expenses)[i+1:]...)
-			break
+
+			err := s.save()
+
+			if err != nil {
+				return err
+			}
+
+			return nil
 		}
 	}
 
 	if !foundItem {
 		return fmt.Errorf("expense with ID %d not found", id)
-	}
-
-	err := s.save()
-
-	if err != nil {
-		return err
 	}
 
 	return nil
@@ -182,6 +190,13 @@ func (s *csvStore) load() error {
 	if err != nil {
 		return err
 	}
+
+	// remove headers
+	records = records[1:]
+
+	// reset expenses
+	*s.Expenses = []*models.Expense{}
+
 	for _, record := range records {
 		id, err := strconv.Atoi(record[0])
 		if err != nil {
@@ -202,14 +217,26 @@ func (s *csvStore) load() error {
 				return err
 			}
 		}
-		expense := models.Expense{
-			Id:          id,
-			Amount:      amount,
-			Description: record[1],
-			CreatedAt:   createdAt,
-			UpdatedAt:   &updatedAt,
+
+		if record[4] == "" {
+			expense := models.Expense{
+				Id:          id,
+				Amount:      amount,
+				Description: record[1],
+				CreatedAt:   createdAt,
+				UpdatedAt:   nil,
+			}
+			*s.Expenses = append(*s.Expenses, &expense)
+		} else {
+			expense := models.Expense{
+				Id:          id,
+				Amount:      amount,
+				Description: record[1],
+				CreatedAt:   createdAt,
+				UpdatedAt:   &updatedAt,
+			}
+			*s.Expenses = append(*s.Expenses, &expense)
 		}
-		*s.Expenses = append(*s.Expenses, &expense)
 	}
 	return nil
 }
