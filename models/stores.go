@@ -7,7 +7,7 @@ type (
 		Add(expense Expense) error
 		List()
 		Update(expense Expense) error
-		Delete(id int)
+		Delete(id int) error
 		Summary()
 		SummaryForMonth(month time.Month)
 	}

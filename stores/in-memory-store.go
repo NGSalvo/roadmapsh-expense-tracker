@@ -56,13 +56,20 @@ func (s *InMemoryStore) Update(expense models.Expense) error {
 	return fmt.Errorf("expense with ID %d not found", expense.Id)
 }
 
-func (s *InMemoryStore) Delete(id int) {
+func (s *InMemoryStore) Delete(id int) error {
+	foundItem := false
 	for i, item := range *s.Expenses {
 		if item.Id == id {
 			*s.Expenses = append((*s.Expenses)[:i], (*s.Expenses)[i+1:]...)
 			break
 		}
 	}
+
+	if !foundItem {
+		return fmt.Errorf("expense with ID %d not found", id)
+	}
+
+	return nil
 }
 
 func (s *InMemoryStore) List() {

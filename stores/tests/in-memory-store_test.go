@@ -179,7 +179,7 @@ func TestInMemoryStore(t *testing.T) {
 		store.Add(expense)
 
 		// When
-		store.Delete(2)
+		err := store.Delete(2)
 
 		// Then
 		expenses := *store.Expenses
@@ -187,6 +187,7 @@ func TestInMemoryStore(t *testing.T) {
 		asserts.Equal(1, expenses[0].Id)
 		asserts.Equal("Lunch", expenses[0].Description)
 		asserts.Nil(expenses[0].UpdatedAt)
+		asserts.Error(fmt.Errorf("expense with ID %d not found", err))
 	})
 
 	t.Run("✅ should list all expenses", func(t *testing.T) {
