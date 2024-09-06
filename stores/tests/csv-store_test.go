@@ -14,16 +14,16 @@ import (
 func TestCsvStore(t *testing.T) {
 	asserts := assert.New(t)
 
-	t.Run("✅ should instantiate an in-memory store", func(t *testing.T) {
+	t.Run("✅ should instantiate an csv store", func(t *testing.T) {
 		// When
-		store := stores.NewInMemoryStore()
+		store := stores.NewCsvStore("test.csv")
 		// Then
 		asserts.NotNil(store)
 	})
 
 	t.Run("✅ should add an expense with a description and amount", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -46,7 +46,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("✅ should add two expenses", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -69,7 +69,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("❌ should not add an expense with a negative amount", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := -20
 		description := "Lunch"
 
@@ -86,7 +86,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("✅ should update an expense", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -109,7 +109,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("❌ should not updated an non-existent expense", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -132,7 +132,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("❌ should not update an expense with a negative amount", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -154,7 +154,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("✅ should delete an expense", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -171,7 +171,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("❌ should not delete an non-existent expense", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -191,7 +191,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("✅ should list all expenses", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -215,7 +215,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("✅ should print the header when there are no expenses", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 
 		// When
 		result := dsl.OutputToString(store.List)
@@ -226,7 +226,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("✅ should print the summary of all expenses", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -247,7 +247,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("✅ should print the summary of all expenses for a specific month of the current year", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -280,7 +280,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("✅ should print 0 when there are no expenses for a specific month of the current year", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
@@ -313,7 +313,7 @@ func TestCsvStore(t *testing.T) {
 
 	t.Run("✅ should print the expenses from a specific month and current year taking on account the updated at", func(t *testing.T) {
 		// Given
-		store := stores.NewInMemoryStore().(*stores.InMemoryStore)
+		store := stores.NewCsvStore()
 		amount := 20
 		description := "Lunch"
 
