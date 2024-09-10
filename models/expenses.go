@@ -20,8 +20,8 @@ type (
 )
 
 const (
-	HeaderFormat         = "|ID|Description|Amount|Created At|Updated At|"
-	ExpensesStringFormat = "|%-3d|%-10s|%-6d|%-10s|%-10s|"
+	HeaderFormat         = "|ID    |Description|Amount|Created At|Updated At|"
+	ExpensesStringFormat = "|%-6d|%-11s|%-6d|%-10s|%-10s|\n"
 	DateFormat           = time.DateOnly
 )
 
